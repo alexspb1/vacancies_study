@@ -25,8 +25,8 @@ SECRET_KEY = 'django-insecure-rjo&8c!05v=&w3foql$bbs!@ijzs3^8pe6$no%o$fw7f46a7zj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+STATIC_ROOT = 'static'
 
 # Application definition
 
@@ -47,6 +47,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'findjob'
 ]
 
 ROOT_URLCONF = 'conf.urls'
