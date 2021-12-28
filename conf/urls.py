@@ -16,6 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from findjob import views as findjobs_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', findjobs_views.main_view, name='main_view'),
+    path('vacancies', findjobs_views.all_vacancies, name='all_vacancies'),
+    path('vacancies/cat/<str:specialty_input>', findjobs_views.all_vacancies_special, name='all_vacancies_special'),
+    path('companies/<int:company_id>', findjobs_views.company_cart, name='company_cart'),
+    path('vacancies/<int:vacancy_id>', findjobs_views.vacancy_cart, name='vacancy_cart'),
 ]
