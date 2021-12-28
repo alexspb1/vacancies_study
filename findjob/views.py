@@ -35,6 +35,7 @@ def all_vacancies_special(request, specialty_input: str):
     }
     return render(request, 'findjob/vacancies.html', context=context)
 
+
 def company_cart(request, company_id: int):
     companies_list = get_object_or_404(Company, id=company_id)
     vacancies_list = companies_list.vacancies.all()
