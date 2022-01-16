@@ -13,10 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
 from findjob import views as findjobs_views
+from findjob.views import MySignupView, MyLoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,5 +27,23 @@ urlpatterns = [
     path('vacancies', findjobs_views.all_vacancies, name='all_vacancies'),
     path('vacancies/cat/<str:specialty_input>', findjobs_views.all_vacancies_special, name='all_vacancies_special'),
     path('companies/<int:company_id>', findjobs_views.company_cart, name='company_cart'),
-    path('vacancies/<int:vacancy_id>', findjobs_views.vacancy_cart, name='vacancy_cart'),
+    path('vacancies/<int:vacancy_id>', findjobs_views.ApplicationView.as_view(), name='vacancy_cart'),
+    path('vacancies/<int:vacancy_id>/send', findjobs_views.ApplicationResultView.as_view(), name='vacancy_send'),
+    path('mycompany/create', findjobs_views.CompanyView.as_view(), name='mycompany_create'),
+    path('mycompany', findjobs_views.MycompanyView.as_view(), name='mycompany'),
+    path('mycompany/vacancies', findjobs_views.VacancyListView.as_view(), name='mycompany_vacancies'),
+    path('mycompany/vacancies/create', findjobs_views.VacancyCreateView.as_view(), name='mycompany_vacancy_create'),
+    path('mycompany/vacancies/<int:vacancy_id>', findjobs_views.VacancyEditView.as_view(), name='mycompany_vacancy_edit'),
+    path('mycompany/vacancies/applications/<int:vacancy_id>', findjobs_views.ApplicationListView.as_view(), name='mycompany_application_list'),
+    path('resume', findjobs_views.MyResumeView.as_view(), name='resume'),
+    path('resume/create', findjobs_views.ResumeCreateView.as_view(), name='resume_create'),
+    path('search', findjobs_views.search, name='search'),
+    path('login', MyLoginView.as_view(), name='login_user'),
+    path('register', MySignupView.as_view(), name='register'),
+    path('logout', findjobs_views.logout_user, name='logout_user'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
+

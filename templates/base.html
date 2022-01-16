@@ -7,8 +7,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    {% block style %}
+    {% endblock %}
 </head>
 <body>
+{% block alerts %}
+<section class="container mt-3">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">x</span>
+            </button>
+        </div>
+    {% endfor %}
+</section>
+{% endblock alerts %}
+
 <header class="container mt-3">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand mr-4" href="{% url 'main_view' %}">Джуманджи</a>
@@ -23,9 +38,23 @@
                 </li>
             </ul>
             <ul class="navbar-nav col-2 justify-content-end">
+                {% if request.user.is_authenticated %}
                 <li class="nav-item active">
-                    <a href="#" class="nav-link font-weight-bold">Вход</a>
+                <div class="btn-group">
+                    <button type="button" class="btn dropdown-toggle font-weight-bold" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ user.username }}</button>
+                    <div class="dropdown-menu dropdown-menu-right mt-3">
+                        <a href="{% url 'resume' %}" class="dropdown-item py-2">Резюме</a>
+                        <a href="{% url 'mycompany' %}" class="dropdown-item py-2">Компания</a>
+                        <a href="{% url 'logout_user' %}" class="dropdown-item py-2">Выход</a>
+                    </div>
+                </div>
                 </li>
+                {% else %}
+                <li class="nav-item active">
+                    <a href="{% url 'login_user' %}" class="nav-link font-weight-bold">Вход</a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </nav>

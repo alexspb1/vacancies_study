@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
 {% block body %}
 <main class="container mt-3 pb-5">
     <div class="row mt-5">
@@ -7,37 +9,24 @@
                 <p><a href="javascript:history.go(-1)">Назад</a></p>
             </div>
         </div>
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-12">
             <section class="pl-3">
-                <a href="#"><img src="https://place-hold.it/130x80" width="130" height="80" alt=""></a>
+                <a href="{% url 'company_cart' company_id=vacancies_list.company.id %}"><img src="{{MEDIA_URL}}{{ vacancies_list.company.logo.url }}" width="130" height="80" alt=""></a>
                 <div class="d-flex align-items-baseline align-content-baseline">
                     <h1 class="h2 mt-4 font-weight-bold">{{ vacancies_list.title }}</h1>
                     <p class="m-0 pl-3">{{ vacancies_list.salary_min }} – {{ vacancies_list.salary_max }} Р</p>
                 </div>
                 <p class="mt-2">{{ vacancies_list.skills }}</p>
-                <p class="text-muted mb-4">{{ companies_list.name }} ({{ companies_list.employee_count }} человек), {{ companies_list.location }} или удаленно</p>
+                <p class="text-muted mb-4">{{ vacancies_list.company.name }} ({{ vacancies_list.company.employee_count }} человек), {{ vacancies_list.company.location }} или удаленно</p>
                 <div style="line-height: 1.8;">
-                    <p>{{ companies_list.description }}
+                    <p>{{ vacancies_list.description|safe }}
                     </p>
                 </div>
-                <form action="/echo" class="card mt-4 mb-3" enctype="multipart/form-data">
-                    <div class="card-body mx-3">
-                        <p class="h5 mt-3 font-weight-normal">Отозваться на вакансию</p>
-                        <div class="form-group">
-                            <label class="mb-1 mt-2" for="userName">Вас зовут</label>
-                            <input class="form-control" type="text" placeholder="" id="userName">
-                        </div>
-                        <div class="form-group">
-                            <label class="mb-1" for="userPhone">Ваш телефон</label>
-                            <input class="form-control" type="tel" placeholder="" id="userPhone">
-                        </div>
-                        <div class="form-group">
-                            <label class="mb-1" for="userMsg">Сопроводительное письмо</label>
-                            <textarea class="form-control" rows="8" id="userMsg"></textarea>
-                        </div>
-                        <input type="submit" class="btn btn-primary mt-4 mb-2" value="Записаться на пробный урок">
-                    </div>
-                </form>
+                {% if request.user.is_authenticated %}
+                {% crispy form %}
+                {% else %}
+                <button class="col-4 btn btn-lg btn-block"><a href="{% url 'login_user' %}">Для отклика на вакансию нужно авторизоваться</a></button>
+                {% endif %}
             </section>
         </div>
     </div>
