@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path
 
 from findjob import views as findjobs_views
-from findjob.views import MySignupView, MyLoginView
+from authorization import views as au_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,9 +38,9 @@ urlpatterns = [
     path('resume', findjobs_views.MyResumeView.as_view(), name='resume'),
     path('resume/create', findjobs_views.ResumeCreateView.as_view(), name='resume_create'),
     path('search', findjobs_views.search, name='search'),
-    path('login', MyLoginView.as_view(), name='login_user'),
-    path('register', MySignupView.as_view(), name='register'),
-    path('logout', findjobs_views.logout_user, name='logout_user'),
+    path('login', au_views.MyLoginView.as_view(), name='login_user'),
+    path('register', au_views.MySignupView.as_view(), name='register'),
+    path('logout', au_views.logout_user, name='logout_user'),
 ]
 
 if settings.DEBUG:

@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView, ListView
 
-from findjob.forms import ApplicationForm, RegisterUserForm, LoginForm, CompanyForm, VacancyForm, ResumeForm
+from findjob.forms import ApplicationForm, CompanyForm, VacancyForm, ResumeForm
 from findjob.models import Vacancy, Company, Specialty, Application, Resume
 
 
@@ -65,13 +65,17 @@ def vacancy_cart(request, vacancy_id: int):
     }
     return render(request, 'findjob/vacancy.html', context=context)
 
+
 def search(request):
-    search_query = request.GET.get('search','')
+    search_query = request.GET.get('search', '')
     if search_query.isalpha():
-        found_vacancies = Vacancy.objects.filter(Q(title__icontains=search_query) | Q(description__icontains=search_query))
+        found_vacancies = Vacancy.objects.filter(
+            Q(title__icontains=search_query) | Q(description__icontains=search_query) | Q(
+                skills__icontains=search_query))
     else:
         found_vacancies = None
-    return render(request, 'findjob/search.html', context={'found_vacancies':found_vacancies})
+    return render(request, 'findjob/search.html', context={'found_vacancies': found_vacancies})
+
 
 # _____For vacancies create/update_____
 
@@ -114,28 +118,6 @@ class VacancyEditView(SuccessMessageMixin, UpdateView):
         print(vacancy_list)
         return vacancy_list
 
-# _____For authorization_____
-
-class MySignupView(CreateView):
-    model = User
-    form_class = RegisterUserForm
-    success_url = reverse_lazy('main_view')
-    template_name = 'findjob/register.html'
-
-    def form_valid(self, form):
-        user = form.save()
-        login(self.request, user)
-        return redirect('/')
-
-class MyLoginView(LoginView):
-    form_class = LoginForm
-    template_name = 'findjob/login.html'
-    redirect_authenticated_user = True
-
-def logout_user(request):
-    logout(request)
-    return redirect('/')
-
 # _____For applications create_____
 
 class ApplicationView(View):
@@ -161,6 +143,7 @@ class ApplicationView(View):
         messages.error(request, 'Ошибка в заявке, попробуйте снова')
         return redirect(request.path)
 
+
 class ApplicationListView(ListView):
     template_name = 'findjob/applications.html'
     context_object_name = 'applications_list'
@@ -170,9 +153,11 @@ class ApplicationListView(ListView):
         applications_list = Application.objects.filter(vacancy=vacancy_id)
         return applications_list
 
+
 class ApplicationResultView(View):
     def get(self, request, vacancy_id):
         return render(request, 'findjob/sent.html', {'vacancy_id': vacancy_id})
+
 
 # _____For company create/update_____
 
@@ -186,6 +171,7 @@ class CompanyView(CreateView):
         company_form.owner = self.request.user
         company_form.save()
         return redirect('/mycompany')
+
 
 class MycompanyView(SuccessMessageMixin, UpdateView):
     model = Company
@@ -204,6 +190,7 @@ class MycompanyView(SuccessMessageMixin, UpdateView):
         else:
             return object
 
+
 # _____For resume create/update_____
 
 class ResumeCreateView(CreateView):
@@ -216,6 +203,7 @@ class ResumeCreateView(CreateView):
         resume_form.user = self.request.user
         resume_form.save()
         return redirect('/resume')
+
 
 class MyResumeView(SuccessMessageMixin, UpdateView):
     model = Resume

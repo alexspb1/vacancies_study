@@ -3,15 +3,17 @@ from django.db import models
 from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
 
+
 class Vacancy(models.Model):
     title = models.CharField(max_length=100)
     specialty = models.ForeignKey('Specialty', on_delete=models.CASCADE, related_name='vacancies')
-    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='vacancies',default=None, null=True)
+    company = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='vacancies', default=None, null=True)
     skills = models.CharField(max_length=100)
     description = models.TextField()
     salary_min = models.IntegerField()
     salary_max = models.IntegerField()
     published_at = models.DateField(default=timezone.now)
+
 
 class Company(models.Model):
     name = models.CharField(max_length=100)
@@ -19,7 +21,8 @@ class Company(models.Model):
     logo = models.ImageField(upload_to='company')
     description = models.TextField()
     employee_count = models.IntegerField()
-    owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name='owner_company',default=None, null=True)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name='owner_company', default=None, null=True)
+
 
 class Specialty(models.Model):
     code = models.CharField(max_length=100)
@@ -29,12 +32,14 @@ class Specialty(models.Model):
     def __str__(self):
         return self.title
 
+
 class Application(models.Model):
     written_username = models.CharField(max_length=100)
     written_phone = PhoneNumberField(null=False, blank=False, unique=True)
     written_cover_letter = models.TextField()
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='applications', null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='applications', null=True)
+
 
 class Resume(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='resume', null=True)
@@ -72,5 +77,3 @@ class Resume(models.Model):
 
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=ACTIVE_STATUS)
     grade = models.CharField(max_length=1, choices=GRADES_CHOICES, default=0, null=True)
-
-
