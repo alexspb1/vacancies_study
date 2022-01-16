@@ -9,8 +9,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, UpdateView, ListView
 
-from findjob.forms import ApplicationForm, RegisterUserForm, LoginForm, CompanyForm, VacancyForm, \
-    ResumeForm
+from findjob.forms import ApplicationForm, RegisterUserForm, LoginForm, CompanyForm, VacancyForm, ResumeForm
 from findjob.models import Vacancy, Company, Specialty, Application, Resume
 
 
