@@ -20,7 +20,7 @@ def main_view(request):
         'companies_list': companies_list,
         'specialties_list': specialties_list,
     }
-    return render(request, 'findjob/index.html', context=context)
+    return render(request, 'findjob/main_pages/index.html', context=context)
 
 
 def all_vacancies(request):
@@ -30,7 +30,7 @@ def all_vacancies(request):
         'vacancies_list': vacancies_list,
         'vacancy_title': vacancy_title,
     }
-    return render(request, 'findjob/vacancies.html', context=context)
+    return render(request, 'findjob/main_pages/vacancies.html', context=context)
 
 
 def all_vacancies_special(request, specialty_input: str):
@@ -42,7 +42,7 @@ def all_vacancies_special(request, specialty_input: str):
         'vacancy_title': vacancy_title,
         'specialties_list': specialties_list,
     }
-    return render(request, 'findjob/vacancies.html', context=context)
+    return render(request, 'findjob/main_pages/vacancies.html', context=context)
 
 
 def company_cart(request, company_id: int):
@@ -52,7 +52,7 @@ def company_cart(request, company_id: int):
         'companies_list': companies_list,
         'vacancies_list': vacancies_list,
     }
-    return render(request, 'findjob/company.html', context=context)
+    return render(request, 'findjob/main_pages/company.html', context=context)
 
 
 def vacancy_cart(request, vacancy_id: int):
@@ -61,7 +61,7 @@ def vacancy_cart(request, vacancy_id: int):
         'vacancies_list': vacancies_list,
         'form': ApplicationForm,
     }
-    return render(request, 'findjob/vacancy.html', context=context)
+    return render(request, 'findjob/main_pages/vacancy.html', context=context)
 
 
 def search(request):
@@ -72,7 +72,7 @@ def search(request):
                 skills__icontains=search_query))
     else:
         found_vacancies = None
-    return render(request, 'findjob/search.html', context={'found_vacancies': found_vacancies})
+    return render(request, 'findjob/main_pages/search.html', context={'found_vacancies': found_vacancies})
 
 
 # _____For vacancies create/update_____
@@ -80,7 +80,11 @@ def search(request):
 class VacancyCreateView(CreateView):
     model = Vacancy
     form_class = VacancyForm
-    template_name = 'findjob/vacancy-create.html'
+    template_name = 'findjob/myvacancies_pages/vacancy-create.html'
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
 
     def form_valid(self, form):
         vacancy_form = form.save(commit=False)
@@ -93,8 +97,12 @@ class VacancyCreateView(CreateView):
 
 
 class VacancyListView(ListView):
-    template_name = 'findjob/vacancy-list.html'
+    template_name = 'findjob/myvacancies_pages/vacancy-list.html'
     context_object_name = 'vacancy_list'
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
 
     def get_queryset(self):
         user = self.request.user
@@ -105,9 +113,13 @@ class VacancyListView(ListView):
 class VacancyEditView(SuccessMessageMixin, UpdateView):
     form_class = VacancyForm
     success_message = 'Информация о вакансии обновлена'
-    template_name = 'findjob/vacancy-edit.html'
+    template_name = 'findjob/myvacancies_pages/vacancy-edit.html'
     success_url = reverse_lazy('mycompany_vacancies')
     context_object_name = 'vacancy_list'
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
 
     def get_object(self, queryset=None):
         vacancy_id = self.kwargs.get('vacancy_id', None)
@@ -116,19 +128,20 @@ class VacancyEditView(SuccessMessageMixin, UpdateView):
         print(vacancy_list)
         return vacancy_list
 
+
 # _____For applications create_____
 
 class ApplicationView(View):
 
     def get(self, request, vacancy_id: int):
         vacancies_list = get_object_or_404(Vacancy, id=vacancy_id)
-        companies_list = Company.objects.get(vacancies__id=vacancy_id)
+        companies_list = get_object_or_404(Company, vacancies__id=vacancy_id)
         context = {
             'vacancies_list': vacancies_list,
             'companies_list': companies_list,
             'form': ApplicationForm,
         }
-        return render(request, 'findjob/vacancy.html', context=context)
+        return render(request, 'findjob/main_pages/vacancy.html', context=context)
 
     def post(self, request, vacancy_id):
         form = ApplicationForm(request.POST)
@@ -143,8 +156,12 @@ class ApplicationView(View):
 
 
 class ApplicationListView(ListView):
-    template_name = 'findjob/applications.html'
+    template_name = 'findjob/myvacancies_pages/applications.html'
     context_object_name = 'applications_list'
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
 
     def get_queryset(self):
         vacancy_id = self.kwargs.get('vacancy_id', None)
@@ -153,16 +170,23 @@ class ApplicationListView(ListView):
 
 
 class ApplicationResultView(View):
+
     def get(self, request, vacancy_id):
-        return render(request, 'findjob/sent.html', {'vacancy_id': vacancy_id})
+        return render(request, 'findjob/main_pages/sent.html', {'vacancy_id': vacancy_id})
 
 
 # _____For company create/update_____
 
-class CompanyView(CreateView):
+class CompanyCreateView(CreateView):
     model = Company
     form_class = CompanyForm
-    template_name = 'findjob/company-edit.html'
+    template_name = 'findjob/mycompany_pages/company-edit.html'
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
+        elif get_object_or_404(Company, owner=self.request.user):
+            return redirect('/mycompany')
 
     def form_valid(self, form):
         company_form = form.save(commit=False)
@@ -175,8 +199,12 @@ class MycompanyView(SuccessMessageMixin, UpdateView):
     model = Company
     form_class = CompanyForm
     success_message = 'Информация о компании обновлена'
-    template_name = 'findjob/mycompany.html'
+    template_name = 'findjob/mycompany_pages/mycompany.html'
     success_url = reverse_lazy('mycompany')
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
 
     def get_object(self):
         user = self.request.user
@@ -194,7 +222,7 @@ class MycompanyView(SuccessMessageMixin, UpdateView):
 class ResumeCreateView(CreateView):
     model = Resume
     form_class = ResumeForm
-    template_name = 'findjob/resume-create.html'
+    template_name = 'findjob/myresume_pages/resume-create.html'
 
     def form_valid(self, form):
         resume_form = form.save(commit=False)
@@ -202,13 +230,23 @@ class ResumeCreateView(CreateView):
         resume_form.save()
         return redirect('/resume')
 
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
+        elif get_object_or_404(Resume, user=self.request.user):
+            return redirect('/resume')
+
 
 class MyResumeView(SuccessMessageMixin, UpdateView):
     model = Resume
     form_class = ResumeForm
     success_message = 'Резюме обновлено'
-    template_name = 'findjob/resume.html'
+    template_name = 'findjob/myresume_pages/resume.html'
     success_url = reverse_lazy('resume')
+
+    def render_to_response(self, context, **response_kwargs):
+        if not self.request.user.is_authenticated:
+            return redirect('/login')
 
     def get_object(self):
         user = self.request.user
@@ -219,6 +257,7 @@ class MyResumeView(SuccessMessageMixin, UpdateView):
             return object
         else:
             return object
+
 
 # _____For handlers_____
 

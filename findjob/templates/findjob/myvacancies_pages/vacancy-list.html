@@ -21,7 +21,7 @@
                   <div class="row align-items-center">
                     {% for vacancy in vacancy_list %}
                     <div class="col-6 col-lg-8">
-                      <a href="#" class="mb-1">{{ vacancy.title }}</a>
+                      <a href="{% url 'mycompany_vacancy_edit' vacancy_id=vacancy.id %}" class="mb-1">{{ vacancy.title }}</a>
                       <p class="mb-1">
                         <span class="mr-4">от {{ vacancy.salary_min }} до {{ vacancy.salary_max }}</span><a href="{% url 'mycompany_application_list' vacancy_id=vacancy.id %}" class="text-info">{{ vacancy.applications.count }} отклика</a>
                       </p>

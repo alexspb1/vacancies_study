@@ -12,7 +12,7 @@ class MySignupView(CreateView):
     model = User
     form_class = RegisterUserForm
     success_url = reverse_lazy('main_view')
-    template_name = 'findjob/register.html'
+    template_name = 'authorization/register.html'
 
     def form_valid(self, form):
         user = form.save()
@@ -22,9 +22,8 @@ class MySignupView(CreateView):
 
 class MyLoginView(LoginView):
     form_class = LoginForm
-    template_name = 'findjob/login.html'
+    template_name = 'authorization/login.html'
     redirect_authenticated_user = True
-
 
 def logout_user(request):
     logout(request)
