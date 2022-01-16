@@ -80,11 +80,12 @@ def search(request):
 class VacancyCreateView(CreateView):
     model = Vacancy
     form_class = VacancyForm
-    template_name = 'findjob/myvacancies_pages/vacancy-create.html'
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            return 'findjob/myvacancies_pages/vacancy-create.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def form_valid(self, form):
         vacancy_form = form.save(commit=False)
@@ -97,17 +98,22 @@ class VacancyCreateView(CreateView):
 
 
 class VacancyListView(ListView):
-    template_name = 'findjob/myvacancies_pages/vacancy-list.html'
     context_object_name = 'vacancy_list'
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            return 'findjob/myvacancies_pages/vacancy-list.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def get_queryset(self):
-        user = self.request.user
-        company = get_object_or_404(Company, owner=user)
-        return Vacancy.objects.filter(company=company.id)
+        try:
+            user = self.request.user
+            company = get_object_or_404(Company, owner=user)
+        except:
+            return None
+        else:
+            return Vacancy.objects.filter(company=company.id)
 
 
 class VacancyEditView(SuccessMessageMixin, UpdateView):
@@ -117,9 +123,11 @@ class VacancyEditView(SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('mycompany_vacancies')
     context_object_name = 'vacancy_list'
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            return 'findjob/myvacancies_pages/vacancy-edit.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def get_object(self, queryset=None):
         vacancy_id = self.kwargs.get('vacancy_id', None)
@@ -156,12 +164,20 @@ class ApplicationView(View):
 
 
 class ApplicationListView(ListView):
-    template_name = 'findjob/myvacancies_pages/applications.html'
     context_object_name = 'applications_list'
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            vacancy_id = self.kwargs.get('vacancy_id', None)
+            the_vacancy = Vacancy.objects.filter(id=vacancy_id).first()
+            print(the_vacancy.id, self.request.user.id)
+            the_company = the_vacancy.company
+            if the_company.owner.id != self.request.user.id:
+                return 'findjob/mycompany_pages/mycompany.html'
+            else:
+                return 'findjob/myvacancies_pages/applications.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def get_queryset(self):
         vacancy_id = self.kwargs.get('vacancy_id', None)
@@ -180,13 +196,17 @@ class ApplicationResultView(View):
 class CompanyCreateView(CreateView):
     model = Company
     form_class = CompanyForm
-    template_name = 'findjob/mycompany_pages/company-edit.html'
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
-        elif get_object_or_404(Company, owner=self.request.user):
-            return redirect('/mycompany')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            try:
+                get_object_or_404(Company, owner=self.request.user)
+            except:
+                return 'findjob/mycompany_pages/company-edit.html'
+            else:
+                return 'findjob/mycompany_pages/mycompany.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def form_valid(self, form):
         company_form = form.save(commit=False)
@@ -199,12 +219,13 @@ class MycompanyView(SuccessMessageMixin, UpdateView):
     model = Company
     form_class = CompanyForm
     success_message = 'Информация о компании обновлена'
-    template_name = 'findjob/mycompany_pages/mycompany.html'
     success_url = reverse_lazy('mycompany')
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            return 'findjob/mycompany_pages/mycompany.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def get_object(self):
         user = self.request.user
@@ -222,7 +243,6 @@ class MycompanyView(SuccessMessageMixin, UpdateView):
 class ResumeCreateView(CreateView):
     model = Resume
     form_class = ResumeForm
-    template_name = 'findjob/myresume_pages/resume-create.html'
 
     def form_valid(self, form):
         resume_form = form.save(commit=False)
@@ -230,11 +250,16 @@ class ResumeCreateView(CreateView):
         resume_form.save()
         return redirect('/resume')
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
-        elif get_object_or_404(Resume, user=self.request.user):
-            return redirect('/resume')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            try:
+                get_object_or_404(Resume, user=self.request.user)
+            except:
+                return 'findjob/myresume_pages/resume-create.html'
+            else:
+                return 'findjob/myresume_pages/resume.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
 
 class MyResumeView(SuccessMessageMixin, UpdateView):
@@ -244,9 +269,11 @@ class MyResumeView(SuccessMessageMixin, UpdateView):
     template_name = 'findjob/myresume_pages/resume.html'
     success_url = reverse_lazy('resume')
 
-    def render_to_response(self, context, **response_kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('/login')
+    def get_template_names(self):
+        if self.request.user.is_authenticated:
+            return 'findjob/myresume_pages/resume.html'
+        else:
+            return 'findjob/main_pages/need_authorization.html'
 
     def get_object(self):
         user = self.request.user

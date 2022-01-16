@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block body %}
+  <main class="container mt-3">
+    <section>
+        <p>Для просмотра страницы Вам нужно авторизоваться</p>
+        <div class="nav-item active">
+            <a href="{% url 'login_user' %}" class="nav-link font-weight-bold">Вход</a>
+        </div>
+    </section>
+</main>
+{% endblock %}
