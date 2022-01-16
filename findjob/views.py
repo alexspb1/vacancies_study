@@ -1,9 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout
-from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count, Q
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -221,3 +219,24 @@ class MyResumeView(SuccessMessageMixin, UpdateView):
             return object
         else:
             return object
+
+# _____For handlers_____
+
+def custom_handler400(request, exception):
+    # Call when SuspiciousOperation raised
+    return HttpResponseBadRequest('Неверный запрос!')
+
+
+def custom_handler403(request, exception):
+    # Call when PermissionDenied raised
+    return HttpResponseForbidden('Доступ запрещен!')
+
+
+def custom_handler404(request, exception):
+    # Call when Http404 raised
+    return HttpResponseNotFound('Ресурс не найден!')
+
+
+def custom_handler500(request):
+    # Call when raised some python exception
+    return HttpResponseServerError('Ошибка сервера!')
