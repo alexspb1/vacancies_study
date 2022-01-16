@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block style %}
+{% include 'includes/mycompany_and_resume_style.html' %}
+{% endblock %}
+
+{% block body %}
+    <main class="container mt-3 pb-5">
+        <section class="col-12 col-lg-6 offset-lg-3 mt-5 card">
+         <div class="card-body px-3 pb-4">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <h1 class="h4 pt-2 pb-3">Создать резюме</h1>
+              {{form|crispy }}
+              <input type="submit" class="btn btn-info" value="Сохранить">
+            </form>
+         </div>
+        </section>
+    </main>
+{% endblock %}

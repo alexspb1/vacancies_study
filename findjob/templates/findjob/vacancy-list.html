@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block style %}
+{% include 'includes/mycompany_and_resume_style.html' %}
+{% endblock %}
+
+{% block body %}
+  <main class="container mt-3 pb-5">
+    <div class="row mt-5">
+      {% include 'includes/mycompany_vacancies_menu.html' %}
+      <div class="col-12 col-lg-8">
+        <div class="card">
+          <div class="card-body px-4 pb-4">
+            <section class="tab-pane fade show active">
+              <h2 class="h4 pt-2 pb-3">Вакансии</h2>
+              <!-- vacancy state 1 -->
+              {% if vacancy_list %}
+              <div class="card mt-3">
+                <div class="card-body px-4">
+                  <div class="row align-items-center">
+                    {% for vacancy in vacancy_list %}
+                    <div class="col-6 col-lg-8">
+                      <a href="#" class="mb-1">{{ vacancy.title }}</a>
+                      <p class="mb-1">
+                        <span class="mr-4">от {{ vacancy.salary_min }} до {{ vacancy.salary_max }}</span><a href="{% url 'mycompany_application_list' vacancy_id=vacancy.id %}" class="text-info">{{ vacancy.applications.count }} отклика</a>
+                      </p>
+                    </div>
+                    <div class="col-6 col-lg-4 text-right">
+                      <a href="{% url 'mycompany_vacancy_edit' vacancy_id=vacancy.id %}" class="btn btn-outline-info">Изменить</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+              <div class="pt-4">
+              <a href="{% url 'mycompany_vacancy_create' %}" class="btn btn-info mb-2">Создать новую вакансию</a>
+              </div>
+              {% else %}
+                <h2 class="h4 pt-2 pb-3">Вакансии</h2>
+                <p class="alert alert-info" role="alert">У Вас пока нет вакансий, но Вы можете создать первую</p>
+                <a href="{% url 'mycompany_vacancy_create' %}" class="btn btn-info mb-2">Создать</a>
+              {% endif %}
+              <!-- END vacancy state 2 -->
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+{% endblock %}

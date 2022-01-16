@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block style %}
+{% include 'includes/mycompany_and_resume_style.html' %}
+{% endblock %}
+
+{% block body %}
+<main class="container mt-3 pb-5">
+    <div class="row mt-5">
+      {% include 'includes/mycompany_vacancies_menu.html' %}
+      <div class="col-12 col-lg-8">
+        <div class="card">
+          <div class="card-body px-4 pb-4">
+            <section class="tab-pane fade show active">
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{form|crispy }}
+              <input type="submit" class="btn btn-info" value="Сохранить">
+            </form>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+</main>
+{% endblock %}

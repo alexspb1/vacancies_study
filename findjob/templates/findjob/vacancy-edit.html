@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block style %}
+{% include 'includes/mycompany_and_resume_style.html' %}
+{% endblock %}
+
+{% block body %}
+<main class="container mt-3 pb-5">
+    <div class="row mt-5">
+      {% include 'includes/mycompany_vacancies_menu.html' %}
+      <div class="col-12 col-lg-8">
+        <div class="card">
+          <div class="card-body px-4 pb-4">
+            <section class="tab-pane fade show active">
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <h2 class="h4 pt-2 pb-3">{{ vacancy_list.title }}</h2>
+                  {{form|crispy }}
+                  <input type="submit" class="btn btn-info" value="Сохранить">
+                </form>
+              <!-- END Vacancy info -->
+            </section>
+            <!-- END Tab -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+{% endblock %}
