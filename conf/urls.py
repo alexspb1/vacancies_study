@@ -43,7 +43,7 @@ urlpatterns = [
     path('logout', au_views.logout_user, name='logout_user'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-if settings.DEBUG:
+if not settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
 
