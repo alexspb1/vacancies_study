@@ -43,4 +43,3 @@ urlpatterns = [
     path('logout', au_views.logout_user, name='logout_user'),
 ]
 
-
